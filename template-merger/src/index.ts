@@ -11,10 +11,25 @@ for (const chunk of fs.readFileSync("data.txt", { encoding: "utf8" }).split("\n\
 	generator(++index, lines[0], lines[1], lines[2] === "null" ? null : lines[2], lines[3], lines[4], lines[5], lines[6], lines[7], lines[8]);
 }
 
-async function generator(index: number, ig0: string, chin: string, desc: string | null, ig1: string, msg1: string, ig2: string, msg2: string, ig3: string, msg3: string) {
-	const fullStr = ig0 + desc + ig1 + msg1 + ig2 + msg2 + ig3 + msg3;
-	const summedStrLen = fullStr.length + 6 + (fullStr.match(/\{n\}/g)?.length || 0) * 25;
-	const height = 2200 + summedStrLen * 2;
+async function generator(index: number, ig0: string, chin: string, desc: string | null, ig1: string = "", msg1: string = "", ig2: string = "", msg2: string = "", ig3: string = "", msg3: string = "") {
+	const calcCanvas = new Canvas(1, 1);
+	const calcCtx = calcCanvas.getContext("2d");
+	calcCtx.font = "bold 58px Noto Sans CJK HK";
+	const width0 = calcCtx.measureText(ig0 + "  ").width;
+	const width1 = calcCtx.measureText(ig1 + "  ").width;
+	const width2 = calcCtx.measureText(ig2 + "  ").width;
+	const width3 = calcCtx.measureText(ig3 + "  ").width;
+
+	calcCtx.font = "normal 50px Noto Sans CJK HK";
+	const arr0 = getLines(calcCtx, width0, desc || "");
+	const arr1 = getLines(calcCtx, width1, msg1);
+	const arr2 = getLines(calcCtx, width2, msg2);
+	const arr3 = getLines(calcCtx, width3, msg3);
+
+	//const fullStr = ig0 + desc + ig1 + msg1 + ig2 + msg2 + ig3 + msg3;
+	//const summedStrLen = fullStr.length + 6 + (fullStr.match(/\{n\}/g)?.length || 0) * 25;
+	//const height = 2200 + summedStrLen * 2;
+	const height = 2040 + (arr0.length + arr1.length + arr2.length + arr3.length) * 75;
 	const canvas = new Canvas(1716, height);
 	const ctx = canvas.getContext("2d");
 	ctx.fillStyle = "white";
@@ -82,32 +97,34 @@ async function generator(index: number, ig0: string, chin: string, desc: string 
 	}
 	save.src = "assets/save.svg";
 
-	const allLines = [
-		{ name: ig0, msg: desc },
-		{ name: ig1, msg: msg1 },
-		{ name: ig2, msg: msg2 },
-		{ name: ig3, msg: msg3 }
-	];
-	var offset = 0;
-	for (const lines of allLines) {
-		if (!lines.name) continue;
-		ctx.fillStyle = "black";
-		ctx.font = "bold 58px Noto Sans CJK HK";
-		ctx.fillText(lines.name, 90, 1962 + offset);
-		const nameWidth = ctx.measureText(lines.name + "  ").width;
+	ctx.textBaseline = "top";
+	ctx.fillStyle = "black";
 
-		if (!lines.msg) {
-			offset += 75;
-			continue;
-		}
+	var offset = 0;
+	drawTexts(width0, ig0, arr0);
+	drawTexts(width1, ig1, arr1);
+	drawTexts(width2, ig2, arr2);
+	drawTexts(width3, ig3, arr3);
+	function drawTexts(nameWidth: number, name: string, lines: string[]) {
+		ctx.font = "bold 58px Noto Sans CJK HK";
+		ctx.fillText(name, 90, 1935 + offset);
 		ctx.font = "normal 50px Noto Sans CJK HK";
-		if (/\{n\}/.test(lines.msg)) {
-			const split = lines.msg.split("{n}");
+		for (let ii = 0; ii < lines.length; ii++) {
+			ctx.fillText(lines[ii], 90 + (ii === 0 ? nameWidth : 0), 1940 + offset);
+			offset += 75;
+		}
+	}
+
+	function getLines(ctx: CanvasRenderingContext2D, nameWidth: number, msg: string) {
+		if (/\{n\}/.test(msg)) {
+			const split = msg.split("{n}");
+			const arr: string[] = [];
 			for (let jj = 0; jj < split.length; jj++) {
-				makeBreaks(split[jj], jj !== 0);
+				arr.push(...innerGetLines(nameWidth, split[jj]));
 			}
-		} else makeBreaks(lines.msg);
-		function makeBreaks(msg: string, noHoriOffset: boolean = false) {
+			return arr;
+		} else return innerGetLines(nameWidth, msg);
+		function innerGetLines(nameWidth: number, msg: string) {
 			const lineArr = [];
 			var tempLine = "";
 			for (let ii = 0; ii < msg.length; ii++) {
@@ -125,14 +142,7 @@ async function generator(index: number, ig0: string, chin: string, desc: string 
 				}
 				tempLine += char;
 			}
-			lineArr.push(tempLine);
-			ctx.fillText(<string>lineArr.shift(), 90 + (noHoriOffset ? 0 : nameWidth), 1962 + offset);
-			offset += 75;
-			for (let ii = 0; ii < lineArr.length; ii++) {
-				const line = lineArr[ii];
-				ctx.fillText(line, 90, 1962 + offset);
-				offset += 75;
-			}
+			return lineArr.concat(tempLine);
 		}
 	}
 	fs.writeFileSync(`out/${twoDigits(index)}.png`, canvas.toBuffer());

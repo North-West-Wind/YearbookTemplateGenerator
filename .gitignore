@@ -127,7 +127,7 @@ dist
 .pnp.*
 
 # Testing stuff
-out
-assets
-data*
-lib
+**/out
+**/assets
+**/data*
+**/lib
