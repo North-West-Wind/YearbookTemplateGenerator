@@ -1,3 +1,8 @@
+import * as fs from "fs";
+
+// I doubt anyone would use SVG for profile pic
+const USABLE_EXTENSIONS = ["png", "jpg", "jpeg", "svg"];
+
 export function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: { tl?: number, tr?: number, bl?: number, br?: number } | number, fill: boolean = true, stroke: boolean = false) {
 	if (typeof radius === 'undefined') {
 		radius = 5;
@@ -36,4 +41,12 @@ export function twoDigits(d: number) {
     if (0 <= d && d < 10) return "0" + d.toString();
     if (-10 < d && d < 0) return "-0" + (-1 * d).toString();
     return d.toString();
+}
+
+export function getImage(path: string) {
+	for (const ext of USABLE_EXTENSIONS) {
+		if (fs.existsSync(`${path}.${ext.toLowerCase()}`)) return `${path}.${ext.toLowerCase()}`;
+		else if (fs.existsSync(`${path}.${ext.toUpperCase()}`)) return `${path}.${ext.toUpperCase()}`;
+	}
+	return null;
 }

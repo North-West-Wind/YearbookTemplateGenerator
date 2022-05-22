@@ -1,6 +1,6 @@
 import { Canvas, Image } from "canvas";
 import * as fs from "fs";
-import { circle, roundRect, twoDigits } from "./utils";
+import { circle, getImage, roundRect, twoDigits } from "./utils";
 
 if (!fs.existsSync("out") || !fs.statSync("out").isDirectory()) fs.mkdirSync("out");
 
@@ -39,7 +39,23 @@ async function generator(index: number, ig0: string, chin: string, desc: string 
 	// y - 273
 
 	ctx.fillStyle = "black";
-	circle(ctx, 96, 75, 151 / 2);
+	ctx.save();
+	circle(ctx, 96, 75, 151 / 2, false);
+	ctx.clip();
+	const icon = new Image();
+	await new Promise(resolve => {
+		icon.onload = () => {
+			const shorterSide = Math.min(icon.naturalWidth, icon.naturalHeight);
+			const width = icon.naturalWidth / shorterSide * 151;
+			const height = icon.naturalHeight / shorterSide * 151;
+			ctx.drawImage(icon, 96 + (151 - width) / 2, 75 + (151 - height) / 2, width, height);
+			resolve(undefined);
+		}
+		const src = getImage(`data/icons/icon_${twoDigits(index)}`);
+		if (src) icon.src = src;
+		else resolve(undefined);
+	});
+	ctx.restore();
 
 	ctx.font = "bold 58px Noto Sans CJK HK";
 	ctx.textBaseline = "middle";
@@ -58,8 +74,8 @@ async function generator(index: number, ig0: string, chin: string, desc: string 
 		const side = Math.min(photo.width, photo.height);
 		ctx.drawImage(photo, (photo.width - side) / 2, (photo.height - side) / 2, side, side, 93, 259, 1530, 1530);
 	}
-	if (fs.existsSync(`data/${twoDigits(index)}.png`)) photo.src = `data/${twoDigits(index)}.png`;
-	else if (fs.existsSync(`data/${twoDigits(index)}.jpg`)) photo.src = `data/${twoDigits(index)}.jpg`;
+	const src = getImage(`data/images/${twoDigits(index)}`);
+	if (src) photo.src = src;
 	else {
 		ctx.fillStyle = "#cccccc";
 		ctx.fillRect(93, 259, 1530, 1530);
