@@ -38,7 +38,6 @@ async function generator(index: number, ig0: string, chin: string, desc: string 
 	// x - 642
 	// y - 273
 
-	ctx.fillStyle = "black";
 	ctx.save();
 	circle(ctx, 96, 75, 151 / 2, false);
 	ctx.clip();
