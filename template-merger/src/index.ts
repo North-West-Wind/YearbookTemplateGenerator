@@ -38,24 +38,29 @@ async function generator(index: number, ig0: string, chin: string, desc: string 
 	// x - 642
 	// y - 273
 
-	ctx.save();
-	circle(ctx, 96, 75, 151 / 2, false);
-	ctx.clip();
 	const icon = new Image();
 	await new Promise(resolve => {
-		icon.onload = () => {
+		const url = getImage(`data/icons/icon_${twoDigits(index)}`);
+		icon.onload = async () => {
 			const shorterSide = Math.min(icon.naturalWidth, icon.naturalHeight);
 			const width = icon.naturalWidth / shorterSide * 151;
 			const height = icon.naturalHeight / shorterSide * 151;
-			ctx.drawImage(icon, 96 + (151 - width) / 2, 75 + (151 - height) / 2, width, height);
+			const centerX = 96 + (151 - width) / 2, centerY = 75 + (151 - height) / 2;
+
+			ctx.save();
+			circle(ctx, 96, 75, 151 / 2, false);
+			ctx.clip();
+			
+			ctx.drawImage(icon, centerX, centerY, width, height);
+			ctx.restore();
+
 			resolve(undefined);
 		}
-		const src = getImage(`data/icons/icon_${twoDigits(index)}`);
-		if (src) icon.src = src;
+		if (url) icon.src = url;
 		else resolve(undefined);
 	});
-	ctx.restore();
 
+	ctx.fillStyle = "black";
 	ctx.font = "bold 58px Noto Sans CJK HK";
 	ctx.textBaseline = "middle";
 	ctx.textAlign = "left";

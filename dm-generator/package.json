@@ -2,9 +2,9 @@
   "name": "dm-generator",
   "version": "1.0.0",
   "description": "Even more Node.js canvas magic.",
-  "main": "index.js",
+  "main": "lib/src/index.js",
   "scripts": {
-    "start": "node lib/index.js",
+    "start": "node lib/src/index.js",
     "test": "npm run build && npm start",
     "build": "tsc"
   },

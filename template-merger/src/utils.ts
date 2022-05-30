@@ -48,5 +48,5 @@ export function getImage(path: string) {
 		if (fs.existsSync(`${path}.${ext.toLowerCase()}`)) return `${path}.${ext.toLowerCase()}`;
 		else if (fs.existsSync(`${path}.${ext.toUpperCase()}`)) return `${path}.${ext.toUpperCase()}`;
 	}
-	return null;
+	return "";
 }

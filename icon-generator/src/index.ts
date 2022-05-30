@@ -4,14 +4,14 @@ import { circle, getImage, roundRect, twoDigits } from "./utils";
 
 if (!fs.existsSync("out") || !fs.statSync("out").isDirectory()) fs.mkdirSync("out");
 
-for (let ii = 1; ii <= 29; ii++) generator(ii);
+for (let ii = 1; ii <= 34; ii++) generator(ii);
 
 function generator(index: number) {
 	const icon = new Image();
 	icon.onload = () => {
 		const shorterSide = Math.min(icon.naturalWidth, icon.naturalHeight);
 
-		const canvas = new Canvas(302, 302);
+		const canvas = new Canvas(72, 72);
 		const ctx = canvas.getContext("2d");
 
 		circle(ctx, 0, 0, canvas.width / 2, false);
