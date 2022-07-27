@@ -1,4 +1,5 @@
 # YearbookTemplateGenerator (Gen圖文)
+Pronounced as "Gentlemen". This is read in Cantonese.  
 The generators I wrote specifically for my class in my Graduation Year Book.
 
 ## Gen圖文
